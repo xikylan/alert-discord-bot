@@ -10,18 +10,14 @@ const targetUserID = config.targetID;
 bot.login(token);
 
 bot.on('ready', () => {
-  console.log('Bot is online');
+  console.log('Bot is online.');
 });
 
 bot.on('voiceStateUpdate', async (oldUserState, currentTarget) => {
   if (currentTarget.channelID !== null) {
+    logActivity(currentTarget, true);
     if (currentTarget.id === targetUserID) {
-      logActivity(currentTarget, true);
-      try {
-        playSound(currentTarget);
-      } catch (error) {
-        console.log(error.message);
-      }
+      playSound(currentTarget);
     }
   } else {
     logActivity(currentTarget, false);
@@ -29,11 +25,15 @@ bot.on('voiceStateUpdate', async (oldUserState, currentTarget) => {
 });
 
 async function playSound(target) {
-  const connection = await target.channel.join();
-  connection.play(youtube(url, { filter: 'audioonly' }));
-  setTimeout(() => {
-    connection.disconnect();
-  }, 8000);
+  try {
+    const connection = await target.channel.join();
+    connection.play(youtube(url, { filter: 'audioonly' }));
+    setTimeout(() => {
+      connection.disconnect();
+    }, 8000);
+  } catch (error) {
+    console.log(error.message);
+  }
 }
 
 function logActivity(user, isActive) {

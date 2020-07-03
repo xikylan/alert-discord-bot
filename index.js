@@ -4,32 +4,42 @@ const config = require('./config.js');
 const bot = new Discord.Client();
 
 const token = config.token;
-const channelID = config.codChannelID;
 const url = config.url;
 const targetUserID = config.targetID;
+
+bot.login(token);
 
 bot.on('ready', () => {
   console.log('Bot is online');
 });
 
-bot.on('voiceStateUpdate', async (oldUserState, newUserState) => {
-  if (
-    newUserState.id === targetUserID &&
-    newUserState.channelID === channelID
-  ) {
-    console.log('VINNY JOINED THE CHANNEL.');
-    const connection = await newUserState.channel.join();
-    connection.play(youtube(url, { filter: 'audioonly' }));
-    setTimeout(() => {
-      connection.disconnect();
-    }, 8000);
+bot.on('voiceStateUpdate', async (oldUserState, currentTarget) => {
+  if (currentTarget.channelID !== null) {
+    if (currentTarget.id === targetUserID) {
+      logActivity(currentTarget, true);
+      try {
+        playSound(currentTarget);
+      } catch (error) {
+        console.log(error.message);
+      }
+    }
+  } else {
+    logActivity(currentTarget, false);
   }
-
-  console.log(
-    `${
-      newUserState.guild.members.cache.get(newUserState.id).displayName
-    } has entered the channel.`
-  );
 });
 
-bot.login(token);
+async function playSound(target) {
+  const connection = await target.channel.join();
+  connection.play(youtube(url, { filter: 'audioonly' }));
+  setTimeout(() => {
+    connection.disconnect();
+  }, 8000);
+}
+
+function logActivity(user, isActive) {
+  console.log(
+    `${user.guild.members.cache.get(user.id).displayName} ${
+      isActive ? 'connected' : 'disconnected'
+    }.`
+  );
+}

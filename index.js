@@ -15,19 +15,25 @@ bot.on("ready", () => {
 
 bot.on("voiceStateUpdate", async (oldUserState, currentTarget) => {
   if (currentTarget.channelID !== null) {
+    // when a user enters any channel, log to the console
     logActivity(currentTarget, true);
     if (currentTarget.id === targetUserID) {
+      // if the user is the target user, play the sound
       playSound(currentTarget, url);
     }
   } else {
+    // when a user disconnects, log to the console
     logActivity(currentTarget, false);
   }
 });
 
 async function playSound(target, url) {
   try {
+    // bot joins the same channel as the target user
     const connection = await target.channel.join();
+    // plays audio
     connection.play(youtube(url, { filter: "audioonly" }));
+    // after a certaim time limit, the bot exist the channel
     setTimeout(() => {
       connection.disconnect();
     }, 8000);
@@ -37,6 +43,7 @@ async function playSound(target, url) {
 }
 
 function logActivity(user, isActive) {
+  // log when the user joins/leaves a channel with timestamp.
   console.log(
     `${user.guild.members.cache.get(user.id).displayName} ${
       isActive ? "connected" : "disconnected"

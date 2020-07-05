@@ -5,7 +5,11 @@ const bot = new Discord.Client();
 
 const token = config.token;
 const url = config.url;
+const happyID = config.happyID;
+const myID = config.myID;
+const harryPotter = config.harryPotterURL;
 const targetUserID = config.targetID;
+const serverID = config.serverID;
 
 bot.login(token);
 
@@ -20,6 +24,16 @@ bot.on("voiceStateUpdate", async (oldUserState, currentTarget) => {
     if (currentTarget.id === targetUserID) {
       // if the user is the target user, play the sound
       playSound(currentTarget, url);
+      console.log(
+        currentTarget.guild.channels.cache
+          .get(serverID)
+          .send(
+            "ATTENTION: HE HAS JOINED.\n\nThis is not a test. This is your emergency broadcast system announcing the commencement of the Annual Purge sanctioned by the U.S Government. Weapons of class 4 and lower have been authorized for use during the Purge. All other weapons are restricted. Government officials of ranking 10 have been granted immunity from the Purge and shall not be harmed. Commencing at the siren, any and all crime, including murder, will be legal for 12 continuous hours. Police, fire, and emergency medical services will be unavailable until tomorrow morning, until 7 a.m., when the Purge concludes. Blessed by our New Founding Fathers and America, a nation reborn. May God be with you all."
+          )
+      );
+    }
+    if (currentTarget.id === happyID) {
+      playSound(currentTarget, harryPotter);
     }
   } else {
     // when a user disconnects, log to the console
